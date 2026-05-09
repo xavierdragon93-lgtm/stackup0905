@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DXF Dimension Extractor</title>
+</head>
+<body>
+
+    <h1>Upload DXF File</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".dxf" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if results %}
+        <h2>Extracted Dimensions</h2>
+        <table border="1">
+            <tr>
+                <th>Measurement</th>
+                <th>Text</th>
+                <th>+Tolerance</th>
+                <th>-Tolerance</th>
+            </tr>
+
+            {% for dim in results %}
+            <tr>
+                <td>{{ dim.measurement }}</td>
+                <td>{{ dim.text }}</td>
+                <td>{{ dim.tolerance_upper }}</td>
+                <td>{{ dim.tolerance_lower }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</body>
+</html>
