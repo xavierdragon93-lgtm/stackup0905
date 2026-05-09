@@ -1,4 +1,5 @@
 import ezdxf
+import math
 
 def extract_dimensions(file_path):
     doc = ezdxf.readfile(file_path)
