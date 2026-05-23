@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DXF Dimension Extractor</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 75%;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #999;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        select {
+            padding: 5px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Upload DXF File</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <input
+            type="file"
+            name="file"
+            accept=".dxf"
+            required
+        >
+
+        <button type="submit">
+            Upload
+        </button>
+
+    </form>
+
+    {% if results %}
+
+        <h2>Extracted Dimensions</h2>
+
+        <!-- UNIT SELECTOR -->
+        <label for="unitSelect"><b>Select Units:</b></label>
+
+        <select id="unitSelect" onchange="convertUnits()">
+
+            <option value="mm">Millimeters</option>
+            <option value="inch">Inches</option>
+            <option value="cm">Centimeters</option>
+            <option value="m">Meters</option>
+            <option value="ft">Feet</option>
+
+        </select>
+
+        <table>
+
+            <tr>
+                <th>Measurement</th>
+                <th>Units</th>
+                <th>+Tolerance</th>
+                <th>-Tolerance</th>
+            </tr>
+
+            {% for dim in results %}
+
+            <tr>
+
+                <!-- MEASUREMENT -->
+                <td
+                    class="measurement"
+                    data-mm="{{ dim.measurement_mm }}"
+                >
+                    {{ dim.measurement_mm }}
+                </td>
+
+                <!-- UNIT -->
+                <td class="unitLabel">
+                    mm
+                </td>
+
+                <!-- + TOL -->
+                <td
+                    class="tolUpper"
+                    data-mm="{{ dim.tolerance_upper }}"
+                >
+                    {{ dim.tolerance_upper }}
+                </td>
+
+                <!-- - TOL -->
+                <td
+                    class="tolLower"
+                    data-mm="{{ dim.tolerance_lower }}"
+                >
+                    {{ dim.tolerance_lower }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    {% endif %}
+
+    <script>
+
+        function getConversionFactor(unit) {
+
+            if (unit === "inch") return 25.4;
+
+            if (unit === "cm") return 10;
+
+            if (unit === "m") return 1000;
+
+            if (unit === "ft") return 304.8;
+
+            return 1;
+        }
+
+
+        function convertValue(mmValue, unit) {
+
+            const factor = getConversionFactor(unit);
+
+            return (mmValue / factor).toFixed(3);
+        }
+
+
+        function convertUnits() {
+
+            const unit =
+                document.getElementById("unitSelect").value;
+
+            // -----------------------------
+            // Measurements
+            // -----------------------------
+            const measurements =
+                document.querySelectorAll(".measurement");
+
+            measurements.forEach((cell) => {
+
+                const mmValue =
+                    parseFloat(cell.dataset.mm);
+
+                cell.innerText =
+                    convertValue(mmValue, unit);
+            });
+
+            // -----------------------------
+            // Upper Tolerance
+            // -----------------------------
+            const upperTols =
+                document.querySelectorAll(".tolUpper");
+
+            upperTols.forEach((cell) => {
+
+                const mmValue =
+                    parseFloat(cell.dataset.mm);
+
+                cell.innerText =
+                    convertValue(mmValue, unit);
+            });
+
+            // -----------------------------
+            // Lower Tolerance
+            // -----------------------------
+            const lowerTols =
+                document.querySelectorAll(".tolLower");
+
+            lowerTols.forEach((cell) => {
+
+                const mmValue =
+                    parseFloat(cell.dataset.mm);
+
+                cell.innerText =
+                    convertValue(mmValue, unit);
+            });
+
+            // -----------------------------
+            // Update Unit Labels
+            // -----------------------------
+            const labels =
+                document.querySelectorAll(".unitLabel");
+
+            labels.forEach((label) => {
+                label.innerText = unit;
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
